@@ -1,8 +1,8 @@
 package com.example.lab2.services;
 
-import com.example.lab2.jms.Sender;
+import com.example.lab2.jms.EventListenerFactory;
+import com.example.lab2.jms.EventManager;
 import com.example.lab2.models.Model;
-import com.example.lab2.repositories.DressRepository;
 import com.example.lab2.repositories.ModelRepository;
 import com.example.lab2.utils.Converter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,12 +18,15 @@ import java.util.Optional;
 @Transactional
 public class ModelServiceImpl implements ModelService {
     private final ModelRepository repository;
-    @Autowired
-    private Sender sender;
+
+    private EventManager eventManager;
 
     @Autowired
-    public ModelServiceImpl(ModelRepository repository) {
+    public ModelServiceImpl(ModelRepository repository, EventListenerFactory factory, EventManager topic) {
         this.repository = repository;
+        eventManager = topic;
+        eventManager.subscribe(factory.createEmailLoggerListener());
+        eventManager.subscribe(factory.createEventLoggerListener());
     }
 
     @Override
@@ -39,14 +42,14 @@ public class ModelServiceImpl implements ModelService {
     @Override
     public void save(Model model) {
         repository.save(model);
-        sender.sendInsertEvent("Dress",model);
+        eventManager.sendInsertEvent("Model",model);
 
     }
 
     @Override
     public void delete(Model model) {
         repository.delete(model);
-        sender.sendDeleteEvent("Dress",model);
+        eventManager.sendDeleteEvent("Model",model);
 
     }
 }

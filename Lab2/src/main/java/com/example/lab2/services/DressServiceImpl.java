@@ -1,6 +1,8 @@
 package com.example.lab2.services;
 
-import com.example.lab2.jms.Sender;
+
+import com.example.lab2.jms.EventListenerFactory;
+import com.example.lab2.jms.EventManager;
 import com.example.lab2.models.Dress;
 import com.example.lab2.repositories.DressRepository;
 import com.example.lab2.utils.Converter;
@@ -17,12 +19,15 @@ import java.util.Optional;
 @Transactional
 public class DressServiceImpl implements DressService {
     private final DressRepository repository;
-    @Autowired
-    private Sender sender;
+
+    private EventManager eventManager;
 
     @Autowired
-    public DressServiceImpl(DressRepository repository) {
+    public DressServiceImpl(DressRepository repository, EventListenerFactory factory, EventManager topic) {
         this.repository = repository;
+        eventManager = topic;
+        eventManager.subscribe(factory.createEmailLoggerListener());
+        eventManager.subscribe(factory.createEventLoggerListener());
     }
 
     @Override
@@ -38,13 +43,13 @@ public class DressServiceImpl implements DressService {
     @Override
     public void save(Dress dress) {
         repository.save(dress);
-        sender.sendInsertEvent("Dress",dress);
+        eventManager.sendInsertEvent("Dress",dress);
     }
 
     @Override
     public void delete(Dress dress) {
         repository.delete(dress);
-        sender.sendDeleteEvent("Dress",dress);
+        eventManager.sendDeleteEvent("Dress",dress);
 
     }
 }

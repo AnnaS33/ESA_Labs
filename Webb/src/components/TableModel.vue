@@ -56,7 +56,7 @@
 </template>
 
 <script>
-// Change this import in respect to the technology currently using in the backend 
+// Выбираем текущее или закоменченое в зависимости от того с чем работаем - java ee или spring
 import { springGetAll, springDeleteItem, springAddNewItem, springUpdateItem } from "../endpoints/table_model_endpoints";
 //import { eeGetAll, eeDeleteItem, eeAddNewItem, eeUpdateItem } from "../endpoints/table_model_endpoints";
 import DialogExample from "./DialogExample.vue";
@@ -118,7 +118,6 @@ export default {
       // In case of Srping 
       const body = {'fullName': item.fullName, 'age': item.age, 'height': item.height,'weight': item.weight,
         'contractNumber':item.contractNumber,'phone':item.phone}
-      // params = {'childId': 1}
       const params = {'managerId':item.managerId}
       //eeUpdateItem(this.editingItemIndex, params, body)
       springUpdateItem(this.editingItemIndex, params, body)
@@ -134,7 +133,6 @@ export default {
     },
     addNewRowStart() {
       this.title = 'Add new dress'
-      // Defines fields we need to fill in the dialog
       this.newItem = {fullName: '', age: '', height:'',weight: '',contractNumber:'',phone:"",managerId:""}
       this.nextFunction = this.addNewRowEnd
       this.showDialog = true;
@@ -145,7 +143,6 @@ export default {
       // In case of Srping 
       const body = {'fullName': item.fullName, 'age': item.age, 'height': item.height,'weight':item.weight,
         'contractNumber':item.contractNumber,'phone':item.phone}
-      // params = {'childId': 1}
       const params = {'managerId': item.managerId}
       //eeAddNewItem(params, body)
       springAddNewItem(params, body)

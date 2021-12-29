@@ -1,6 +1,8 @@
 package com.example.lab2.services;
 
-import com.example.lab2.jms.Sender;
+import com.example.lab2.jms.EventListenerFactory;
+
+import com.example.lab2.jms.EventManager;
 import com.example.lab2.models.Manager;
 import com.example.lab2.repositories.ManagerRepository;
 import com.example.lab2.repositories.ModelRepository;
@@ -18,12 +20,16 @@ import java.util.Optional;
 @Transactional
 public class ManagerServiceImpl implements ManagerService {
     private final ManagerRepository repository;
-    @Autowired
-    private Sender sender;
+
+    private EventManager eventManager;
 
     @Autowired
-    public ManagerServiceImpl(ManagerRepository repository) {
+    public ManagerServiceImpl(ManagerRepository repository, EventListenerFactory factory, EventManager topic) {
+
         this.repository = repository;
+        eventManager = topic;
+        eventManager.subscribe(factory.createEmailLoggerListener());
+        eventManager.subscribe(factory.createEventLoggerListener());
     }
 
     @Override
@@ -39,14 +45,14 @@ public class ManagerServiceImpl implements ManagerService {
     @Override
     public void save(Manager manager) {
         repository.save(manager);
-        sender.sendInsertEvent("Manager",manager);
+        eventManager.sendInsertEvent("Manager",manager);
 
     }
 
     @Override
     public void delete(Manager manager) {
         repository.delete(manager);
-        sender.sendDeleteEvent("Manager",manager);
+        eventManager.sendDeleteEvent("Manager",manager);
 
 
     }

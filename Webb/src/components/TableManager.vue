@@ -55,7 +55,7 @@
 </template>
 
 <script>
-// Change this import in respect to the technology currently using in the backend 
+// Выбираем текущее или закоменченое в зависимости от того с чем работаем - java ee или spring
 import { springGetAll, springDeleteItem, springAddNewItem, springUpdateItem } from "../endpoints/table_manager_endpoints";
 //import { eeGetAll, eeDeleteItem, eeAddNewItem, eeUpdateItem } from "../endpoints/table_manager_endpoints";
 import DialogExample from "./DialogExample.vue";
@@ -79,7 +79,6 @@ export default {
   },
   methods: {
     nextFunction() {
-      // Placeholder
     },
     getAllRows() {
       //eeGetAll().then((response) => {
@@ -116,7 +115,6 @@ export default {
       // In case of Srping 
       const body = {'fullName': item.fullName, 'costOfServices': item.costOfServices,
         'experience': item.experience,'phone':item.phone,'email':item.email}
-      // params = {'childId': 1}
       const params = {}
       //eeUpdateItem(this.editingItemIndex, params, body)
       springUpdateItem(this.editingItemIndex, params, body)
@@ -143,7 +141,6 @@ export default {
       // In case of Srping 
       const body = {'fullName': item.fullName, 'costOfServices': item.costOfServices,
         'experience': item.experience,'phone': item.phone,'email':item.email}
-      // params = {'childId': 1}
       const params = {}
       //eeAddNewItem(params, body)
       springAddNewItem(params, body)
