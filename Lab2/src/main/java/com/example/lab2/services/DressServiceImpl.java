@@ -1,16 +1,17 @@
 package com.example.lab2.services;
 
 
-import com.example.lab2.jms.EventListenerFactory;
 import com.example.lab2.jms.EventManager;
 import com.example.lab2.models.Dress;
 import com.example.lab2.repositories.DressRepository;
 import com.example.lab2.utils.Converter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.jms.JMSException;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,11 +24,13 @@ public class DressServiceImpl implements DressService {
     private EventManager eventManager;
 
     @Autowired
-    public DressServiceImpl(DressRepository repository, EventListenerFactory factory, EventManager topic) {
+    public DressServiceImpl(DressRepository repository, JmsTemplate template)throws JMSException {
         this.repository = repository;
-        eventManager = topic;
-        eventManager.subscribe(factory.createEmailLoggerListener());
-        eventManager.subscribe(factory.createEventLoggerListener());
+        try {
+            eventManager = new EventManager(template);
+        } catch (JMSException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

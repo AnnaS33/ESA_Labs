@@ -1,15 +1,16 @@
 package com.example.lab2.services;
 
-import com.example.lab2.jms.EventListenerFactory;
 import com.example.lab2.jms.EventManager;
 import com.example.lab2.models.Model;
 import com.example.lab2.repositories.ModelRepository;
 import com.example.lab2.utils.Converter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.jms.JMSException;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,11 +23,14 @@ public class ModelServiceImpl implements ModelService {
     private EventManager eventManager;
 
     @Autowired
-    public ModelServiceImpl(ModelRepository repository, EventListenerFactory factory, EventManager topic) {
+    public ModelServiceImpl(ModelRepository repository, JmsTemplate template) {
         this.repository = repository;
-        eventManager = topic;
-        eventManager.subscribe(factory.createEmailLoggerListener());
-        eventManager.subscribe(factory.createEventLoggerListener());
+        try {
+            eventManager = new EventManager(template);
+        } catch (JMSException e) {
+            e.printStackTrace();
+        }
+
     }
 
     @Override

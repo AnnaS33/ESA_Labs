@@ -1,22 +1,23 @@
 package com.example.lab2.jms;
 
 import com.example.lab2.models.Event;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Component;
 
+import javax.jms.JMSException;
+import javax.jms.Topic;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 
 @Component
-@Scope("prototype")
 public class EventManager {
 
-    ArrayList<EventListener> listenerList = new ArrayList<>();
+    JmsTemplate jmsTemplate;
+    Topic topic;
 
-    public void subscribe(EventListener listener) {
-        listenerList.add(listener);
+    public EventManager(JmsTemplate jmsTemplate) throws JMSException {
+        this.jmsTemplate = jmsTemplate;
+        this.topic = jmsTemplate.getConnectionFactory().createConnection().createSession().createTopic("dataBaseWatchDoq");
     }
 
     public void sendUpdateEvent(String entity, Object value){
@@ -34,8 +35,7 @@ public class EventManager {
         updateListeners(event);
     }
     public void updateListeners(Event event) {
-        for (EventListener listener: listenerList)
-            listener.update(event);
+        jmsTemplate.convertAndSend(topic, event);
     }
 
 }
